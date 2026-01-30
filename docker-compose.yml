@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: warehouse-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: warehouse_db
+      MYSQL_USER: warehouse_user
+      MYSQL_PASSWORD: warehouse_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./src/main/resources/db:/docker-entrypoint-initdb.d
+    networks:
+      - warehouse-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongodb:
+    image: mongo:6.0
+    container_name: warehouse-mongodb
+    environment:
+      MONGO_INITDB_DATABASE: warehouse_audit
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - warehouse-network
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: warehouse-app
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:mysql://mysql:3306/warehouse_db?useSSL=false&serverTimezone=UTC
+      DB_USERNAME: warehouse_user
+      DB_PASSWORD: warehouse_pass
+      MONGODB_URI: mongodb://mongodb:27017/warehouse_audit
+      JWT_SECRET: your-production-secret-key-minimum-256-bits-change-this
+    ports:
+      - "8080:8080"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - warehouse-network
+    restart: unless-stopped
+
+volumes:
+  mysql-data:
+  mongo-data:
+
+networks:
+  warehouse-network:
+    driver: bridge
