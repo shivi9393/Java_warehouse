@@ -27,13 +27,24 @@ buildNumber.properties
 logs/
 *.log
 
-# OS
-.DS_Store
-Thumbs.db
-
 # Application
 application-local.yml
 application-secrets.yml
 
 # Docker
 .env
+.env.*
+
+# Secrets and Keys
+*.key
+*.pem
+*.p12
+*.jks
+*.pfx
+jwt_secret.txt
+
+# OS
+.DS_Store
+Thumbs.db
+._*
+
