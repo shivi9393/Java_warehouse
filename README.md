@@ -1,12 +1,12 @@
-# Warehouse Management SaaS
+# Warehouse Management System
 
-A production-grade multi-tenant SaaS platform for warehouse and vendor management built with Java Spring Boot.
+A Spring Boot microservices application for warehouse operations, vendor onboarding, and purchase order workflows.
 
 ## 🚀 Features
 
 ### Core Functionality
-- **Multi-tenant Architecture**: Complete data isolation between organizations
-- **JWT Authentication**: Secure token-based authentication with 24-hour expiration
+- **Spring Boot Microservices**: Modular architecture for warehouse operations, vendor management, and purchase orders
+- **JWT Authentication**: Secure token-based authentication with Spring Security
 - **Role-Based Access Control (RBAC)**: 5 distinct roles with granular permissions
   - Super Admin (platform owner)
   - Company Admin (organization management)
@@ -15,35 +15,32 @@ A production-grade multi-tenant SaaS platform for warehouse and vendor managemen
   - Vendor (view orders and shipments)
 
 ### Business Modules
-- **Organization & User Management**: Company registration, user invitations, role assignment
-- **Warehouse Management**: Multiple warehouses, storage zones, capacity tracking
-- **Vendor Onboarding**: Vendor profiles, contracts, SLAs, performance ratings
-- **Inventory Lifecycle**: Stock in/out, transfers, adjustments with reason codes
-- **Purchase Order Workflow**: Draft → Approval → Shipment → Receipt
-- **Shipment Tracking**: Mock carrier integration with status updates
+- **Warehouse Operations**: Multiple warehouses, storage zones, inventory management
+- **Vendor Onboarding**: Vendor profiles, contracts, SLAs, performance tracking
+- **Purchase Order Workflows**: Draft → Approval → Shipment → Receipt
+- **Inventory Management**: Stock in/out, transfers, adjustments with audit trail
+- **Shipment Tracking**: Status updates and tracking
 - **Reporting & Alerts**: Low stock alerts, warehouse utilization, vendor KPIs
-- **Audit Logging**: Complete audit trail in MongoDB
 
 ## 🛠️ Technology Stack
 
 - **Framework**: Spring Boot 3.2.1
 - **Language**: Java 17
+- **ORM**: Spring Data JPA + Hibernate
 - **Databases**: 
   - MySQL 8.0 (transactional data)
   - MongoDB 6.0 (audit logs)
-- **Security**: Spring Security + JWT
+- **Security**: Spring Security + JWT-based authentication
 - **API Documentation**: Swagger/OpenAPI 3.0
 - **Build Tool**: Maven
-- **Containerization**: Docker + Docker Compose
 - **Testing**: JUnit 5 + Mockito
 
 ## 📋 Prerequisites
 
 - Java 17 or higher
 - Maven 3.6+
-- Docker and Docker Compose (for containerized deployment)
-- MySQL 8.0 (if running locally without Docker)
-- MongoDB 6.0 (if running locally without Docker)
+- MySQL 8.0
+- MongoDB 6.0
 
 ## 🏗️ Project Structure
 
@@ -76,46 +73,45 @@ warehouse-management/
 
 ## 🚀 Quick Start
 
-### Option 1: Docker Compose (Recommended)
+### 1. Install Dependencies
 
-1. **Clone the repository**
-   ```bash
-   cd "/Users/shivdev/Desktop/Spring/warehouse management"
-   ```
+**Install MySQL** (macOS):
+```bash
+brew install mysql
+brew services start mysql
 
-2. **Start all services**
-   ```bash
-   docker-compose up -d
-   ```
+# Create database and user
+mysql -u root -p
+CREATE DATABASE warehouse_db;
+CREATE USER 'warehouse_user'@'localhost' IDENTIFIED BY 'warehouse_pass';
+GRANT ALL PRIVILEGES ON warehouse_db.* TO 'warehouse_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
 
-3. **Access the application**
-   - API Base URL: `http://localhost:8080/api`
-   - Swagger UI: `http://localhost:8080/api/swagger-ui.html`
+**Install MongoDB** (macOS):
+```bash
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb-community
+```
 
-### Option 2: Local Development
+### 2. Build and Run
 
-1. **Start MySQL**
-   ```bash
-   # Using Docker
-   docker run -d --name warehouse-mysql \
-     -e MYSQL_ROOT_PASSWORD=root_password \
-     -e MYSQL_DATABASE=warehouse_db \
-     -e MYSQL_USER=warehouse_user \
-     -e MYSQL_PASSWORD=warehouse_pass \
-     -p 3306:3306 mysql:8.0
-   ```
+```bash
+cd "/Users/shivdev/Desktop/Spring/warehouse management"
 
-2. **Start MongoDB**
-   ```bash
-   docker run -d --name warehouse-mongodb \
-     -p 27017:27017 mongo:6.0
-   ```
+# Build the project
+mvn clean install
 
-3. **Build and run the application**
-   ```bash
-   mvn clean install
-   mvn spring-boot:run -Dspring-boot.run.profiles=dev
-   ```
+# Run the application
+mvn spring-boot:run
+```
+
+### 3. Access the Application
+
+- **API Base URL**: `http://localhost:8080/api`
+- **Swagger UI**: `http://localhost:8080/api/swagger-ui.html`
 
 ## 📚 API Documentation
 
@@ -173,25 +169,6 @@ mvn clean test jacoco:report
 open target/site/jacoco/index.html
 ```
 
-## 🐳 Docker Commands
-
-```bash
-# Build image
-docker build -t warehouse-management .
-
-# Start services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f app
-
-# Stop services
-docker-compose down
-
-# Stop and remove volumes
-docker-compose down -v
-```
-
 ## 📊 Database Schema
 
 The application uses two databases:
@@ -210,71 +187,45 @@ The application uses two databases:
 
 ## 🔧 Configuration
 
-### Environment Variables (Production)
+### Application Properties
+
+The application uses `application.yml` for configuration. Key settings:
+
+- **Database**: MySQL connection (localhost:3306)
+- **MongoDB**: Audit log storage (localhost:27017)
+- **JWT Secret**: Configurable via environment variable `JWT_SECRET`
+- **Server Port**: 8080
+- **Context Path**: /api
+
+### Environment Variables (Optional)
 
 ```bash
 # Database
-DB_URL=jdbc:mysql://your-rds-endpoint:3306/warehouse_db
-DB_USERNAME=your_db_user
-DB_PASSWORD=your_db_password
+DB_URL=jdbc:mysql://localhost:3306/warehouse_db
+DB_USERNAME=warehouse_user
+DB_PASSWORD=warehouse_pass
 
 # MongoDB
-MONGODB_URI=mongodb://your-mongodb-uri/warehouse_audit
+MONGODB_URI=mongodb://localhost:27017/warehouse_audit
 
 # JWT
 JWT_SECRET=your-256-bit-secret-key-change-this
 ```
 
-## 📈 Architecture
+## 🎯 Key Features Implemented
 
-```mermaid
-graph TB
-    Client[Client Application] --> API[REST API Layer]
-    API --> Auth[Authentication Filter]
-    Auth --> Controller[Controllers]
-    Controller --> Service[Service Layer]
-    Service --> Repository[Repository Layer]
-    Repository --> MySQL[(MySQL)]
-    Repository --> MongoDB[(MongoDB)]
-    Service --> Audit[Audit Service]
-    Audit --> MongoDB
-```
-
-## 🚢 Deployment
-
-### AWS Deployment
-
-See [AWS_DEPLOYMENT.md](AWS_DEPLOYMENT.md) for detailed instructions on deploying to:
-- EC2 instances
-- RDS MySQL
-- MongoDB Atlas
-- Application Load Balancer
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- ✅ Spring Boot microservices for warehouse operations, vendor onboarding, and purchase orders
+- ✅ REST APIs using Spring Data JPA, Hibernate, and MySQL
+- ✅ JWT-based authentication and role-based access control with Spring Security
+- ✅ Unit and integration tests using JUnit
+- ✅ SQL query optimization with proper indexing
+- ✅ SOLID principles implementation in service layers
+- ✅ Audit logging with MongoDB
+- ✅ Swagger/OpenAPI documentation
 
 ## 📝 License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
-
-## 📧 Support
-
-For support, email support@warehouse-saas.com or open an issue in the repository.
-
-## 🎯 Roadmap
-
-- [ ] Email notifications for low stock and PO approvals
-- [ ] Advanced reporting with charts and analytics
-- [ ] Mobile app for warehouse staff
-- [ ] Barcode/QR code scanning
-- [ ] Integration with real carrier APIs
-- [ ] Multi-warehouse transfer optimization
-- [ ] AI-powered demand forecasting
+This project is licensed under the Apache License 2.0.
 
 ---
 
