@@ -29,9 +29,6 @@ public class InventoryService {
     @Autowired
     private WarehouseRepository warehouseRepository;
 
-    @Autowired
-    private AuditService auditService;
-
     @Transactional
     public InventoryDTO stockIn(StockOperationRequest request, Long userId) {
         Product product = productRepository.findById(request.getProductId())
@@ -62,9 +59,6 @@ public class InventoryService {
 
         inventory = inventoryRepository.save(inventory);
 
-        auditService.logAction(userId, warehouse.getOrganization().getId(),
-                "STOCK_IN", "Inventory", inventory.getId(), null);
-
         return convertToDTO(inventory);
     }
 
@@ -83,9 +77,6 @@ public class InventoryService {
 
         inventory.setQuantity(inventory.getQuantity() - request.getQuantity());
         inventory = inventoryRepository.save(inventory);
-
-        auditService.logAction(userId, inventory.getWarehouse().getOrganization().getId(),
-                "STOCK_OUT", "Inventory", inventory.getId(), null);
 
         return convertToDTO(inventory);
     }

@@ -43,9 +43,6 @@ class UserServiceTest {
     @Mock
     private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private AuditService auditService;
-
     @InjectMocks
     private UserService userService;
 
@@ -96,7 +93,6 @@ class UserServiceTest {
         assertEquals(testUser.getId(), result.getId());
         assertEquals(testUser.getEmail(), result.getEmail());
         verify(userRepository).save(any(User.class));
-        verify(auditService).logAction(eq(1L), eq(1L), eq("CREATE"), eq("User"), anyLong(), isNull());
     }
 
     @Test
@@ -177,7 +173,6 @@ class UserServiceTest {
 
         // Assert
         verify(userRepository).save(argThat(user -> !user.getActive()));
-        verify(auditService).logAction(eq(2L), eq(1L), eq("DEACTIVATE"), eq("User"), eq(1L), isNull());
     }
 
     @Test

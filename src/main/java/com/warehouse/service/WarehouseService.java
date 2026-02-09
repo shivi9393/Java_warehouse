@@ -3,7 +3,6 @@ package com.warehouse.service;
 import com.warehouse.dto.StorageZoneDTO;
 import com.warehouse.dto.WarehouseDTO;
 import com.warehouse.entity.*;
-import com.warehouse.exception.DuplicateResourceException;
 import com.warehouse.exception.ResourceNotFoundException;
 import com.warehouse.repository.OrganizationRepository;
 import com.warehouse.repository.UserRepository;
@@ -30,9 +29,6 @@ public class WarehouseService {
     @Autowired
     private UserRepository userRepository;
 
-    @Autowired
-    private AuditService auditService;
-
     @Transactional
     public WarehouseDTO createWarehouse(WarehouseDTO dto, Long userId) {
         Organization organization = organizationRepository.findById(dto.getOrganizationId())
@@ -53,8 +49,6 @@ public class WarehouseService {
 
         warehouse = warehouseRepository.save(warehouse);
 
-        auditService.logAction(userId, organization.getId(), "CREATE", "Warehouse", warehouse.getId(), null);
-
         return convertToDTO(warehouse);
     }
 
@@ -72,9 +66,6 @@ public class WarehouseService {
 
         warehouse.getZones().add(zone);
         warehouseRepository.save(warehouse);
-
-        auditService.logAction(userId, warehouse.getOrganization().getId(),
-                "CREATE", "StorageZone", zone.getId(), null);
 
         return convertZoneToDTO(zone);
     }
@@ -107,9 +98,6 @@ public class WarehouseService {
         }
 
         warehouse = warehouseRepository.save(warehouse);
-
-        auditService.logAction(userId, warehouse.getOrganization().getId(),
-                "UPDATE", "Warehouse", warehouse.getId(), null);
 
         return convertToDTO(warehouse);
     }

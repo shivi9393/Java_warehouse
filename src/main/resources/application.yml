@@ -4,7 +4,7 @@ spring:
   
   # MySQL Configuration
   datasource:
-    url: jdbc:mysql://localhost:3306/warehouse_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC
+    url: jdbc:mysql://localhost:3306/warehouse_db?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: warehouse_user
     password: warehouse_pass
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -18,12 +18,6 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true
     open-in-view: false
-  
-  # MongoDB Configuration
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/warehouse_audit
-      auto-index-creation: true
 
 # JWT Configuration
 jwt:

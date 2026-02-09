@@ -31,9 +31,6 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private AuditService auditService;
-
     @Transactional
     public UserDTO createUser(CreateUserRequest request, Long createdBy) {
         if (userRepository.existsByEmail(request.getEmail())) {
@@ -52,9 +49,7 @@ public class UserService {
         user.setOrganization(organization);
         user.setActive(true);
 
-        user = userRepository.save(user);
-
-        auditService.logAction(createdBy, organization.getId(), "CREATE", "User", user.getId(), null);
+        user = userRepository.save(user); // User created successfully
 
         return convertToDTO(user);
     }
@@ -78,9 +73,7 @@ public class UserService {
 
         user.setActive(false);
         userRepository.save(user);
-
-        auditService.logAction(deactivatedBy, user.getOrganization().getId(),
-                "DEACTIVATE", "User", user.getId(), null);
+        // User deactivated successfully
     }
 
     private UserDTO convertToDTO(User user) {

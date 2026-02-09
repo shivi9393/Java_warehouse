@@ -36,9 +36,6 @@ class VendorServiceTest {
     @Mock
     private OrganizationRepository organizationRepository;
 
-    @Mock
-    private AuditService auditService;
-
     @InjectMocks
     private VendorService vendorService;
 
@@ -93,7 +90,6 @@ class VendorServiceTest {
         assertEquals(testVendor.getId(), result.getId());
         assertEquals(testVendor.getName(), result.getName());
         verify(vendorRepository).save(any(Vendor.class));
-        verify(auditService).logAction(eq(1L), eq(1L), eq("CREATE"), eq("Vendor"), anyLong(), isNull());
     }
 
     @Test
@@ -177,7 +173,6 @@ class VendorServiceTest {
         // Assert
         assertNotNull(result);
         verify(vendorRepository).save(any(Vendor.class));
-        verify(auditService).logAction(eq(2L), eq(1L), eq("UPDATE"), eq("Vendor"), eq(1L), isNull());
     }
 
     @Test

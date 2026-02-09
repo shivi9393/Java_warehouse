@@ -26,9 +26,6 @@ public class VendorService {
     @Autowired
     private OrganizationRepository organizationRepository;
 
-    @Autowired
-    private AuditService auditService;
-
     @Transactional
     public VendorDTO createVendor(VendorDTO dto, Long userId) {
         if (vendorRepository.existsByEmail(dto.getEmail())) {
@@ -51,8 +48,6 @@ public class VendorService {
         vendor.setActive(true);
 
         vendor = vendorRepository.save(vendor);
-
-        auditService.logAction(userId, organization.getId(), "CREATE", "Vendor", vendor.getId(), null);
 
         return convertToDTO(vendor);
     }
@@ -83,9 +78,6 @@ public class VendorService {
         vendor.setComplianceDocuments(dto.getComplianceDocuments());
 
         vendor = vendorRepository.save(vendor);
-
-        auditService.logAction(userId, vendor.getOrganization().getId(),
-                "UPDATE", "Vendor", vendor.getId(), null);
 
         return convertToDTO(vendor);
     }

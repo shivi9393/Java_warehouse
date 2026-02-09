@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.mongodb.config.EnableMongoAuditing;
 
 /**
  * Main application class for Warehouse Management SaaS platform.
@@ -13,7 +12,6 @@ import org.springframework.data.mongodb.config.EnableMongoAuditing;
  */
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableMongoAuditing
 public class WarehouseManagementApplication extends SpringBootServletInitializer {
 
     @Override

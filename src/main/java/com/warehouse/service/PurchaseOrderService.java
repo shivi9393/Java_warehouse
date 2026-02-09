@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -32,9 +31,6 @@ public class PurchaseOrderService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private AuditService auditService;
 
     @Transactional
     public PurchaseOrderDTO createPurchaseOrder(CreatePurchaseOrderRequest request, Long userId) {
@@ -68,9 +64,7 @@ public class PurchaseOrderService {
 
         po.calculateTotal();
         po = purchaseOrderRepository.save(po);
-
-        auditService.logAction(userId, user.getOrganization().getId(),
-                "CREATE", "PurchaseOrder", po.getId(), null);
+        // Purchase order created successfully
 
         return convertToDTO(po);
     }
@@ -91,9 +85,7 @@ public class PurchaseOrderService {
         po.setApprovedBy(user);
         po.setApprovedAt(LocalDateTime.now());
         po = purchaseOrderRepository.save(po);
-
-        auditService.logAction(userId, po.getOrganization().getId(),
-                "APPROVE", "PurchaseOrder", po.getId(), null);
+        // Purchase order approved successfully
 
         return convertToDTO(po);
     }

@@ -40,9 +40,6 @@ public class AuthenticationService {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
-    @Autowired
-    private AuditService auditService;
-
     /**
      * Authenticate user and generate JWT token.
      */
@@ -58,9 +55,7 @@ public class AuthenticationService {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Log login action
-        auditService.logAction(user.getId(), user.getOrganization().getId(),
-                "LOGIN", "User", user.getId(), null);
+        // Login successful
 
         return new AuthenticationResponse(
                 token,
@@ -112,9 +107,7 @@ public class AuthenticationService {
         // Generate token
         String token = tokenProvider.generateToken(admin.getEmail(), admin.getRole().name());
 
-        // Log registration
-        auditService.logAction(admin.getId(), organization.getId(),
-                "REGISTER", "Organization", organization.getId(), null);
+        // Organization created successfully
 
         return new AuthenticationResponse(
                 token,
